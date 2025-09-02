@@ -106,6 +106,16 @@ Yes.
 Sample Readme (delete the above when you're ready to submit, and modify the below so with your links and descriptions)
 ---
 
+Aditri Thakur Assignment a2
+## Your Web Application Title
+Include a very brief summary of your project here. Be sure to include the CSS positioning technique you used, and any required instructions to use your application.
+
+## Technical Achievements
+- **Tech Achievement 1**: Using a combination of...
+
+### Design/Evaluation Achievements
+- **Design Achievement 1**: 
+
 ## Your Web Application Title
 Include a very brief summary of your project here. Be sure to include the CSS positioning technique you used, and any required instructions to use your application.
 
