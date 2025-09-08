@@ -1,4 +1,14 @@
 body {
   background:black;
+  font-family: "Sansation", sans-serif;
   color:white;
+}
+
+#TodoForm {
+  margin-bottom:20px;
+  display:flex;
+  flex-direction: column;
+  gap:10px;
+  max-width:25%;
+  max-height: fit-content;
 }
