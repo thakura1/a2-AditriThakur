@@ -22,11 +22,15 @@ const server = http.createServer(function (request, response) {
   }
 });
 
-function derivedDays(todo){
+function derivedDays(todo) {
   const [y, m, d] = String(todo.deadline).split("-").map(Number);
   const today = new Date();
-  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const dueLocal   = new Date(y, m - 1, d);
+  const todayLocal = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const dueLocal = new Date(y, m - 1, d);
   const msPerDay = 24 * 60 * 60 * 1000;
   // Due today Shows 0 days left
   return Math.round((dueLocal - todayLocal) / msPerDay);
@@ -35,7 +39,7 @@ function derivedDays(todo){
 const handleGet = function (request, response) {
   const filename = dir + request.url.slice(1);
 
-  // Homepage 
+  // Homepage
   if (request.url === "/") {
     sendFile(response, "public/index.html");
   }
@@ -44,7 +48,8 @@ const handleGet = function (request, response) {
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify({ todos }));
     return;
-  } else { // Any other request for a file
+  } else {
+    // Any other request for a file
     sendFile(response, filename);
   }
 };
@@ -59,19 +64,21 @@ const handlePost = function (request, response) {
   request.on("end", function () {
     //console.log(JSON.parse(dataString));
 
-    // ... do something with the data here!!!
-    // Only request to submit will get todos
-    if (request.url !== "/submit") {
-      response.writeHead(404, { "Content-Type": "text/plain" });
-      response.end("Not Found");
+    // Body exists outside of submit because update and delete also adjust todos
+    let body = {};
+    try {
+      body = JSON.parse(dataString || "{}");
+    } catch (e) {
+      response.writeHead(400, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ error: "Could not parse JSON" }));
       return;
     }
-
-    try {
-      const body = JSON.parse(dataString || "{}");
+    // ... do something with the data here!!!
+    // Only request to submit will get todos
+    if (request.url === "/submit") {
       const { name, deadline, importance } = body;
 
-      // Error so all feilds are filled out, send error status 
+      // Error so all feilds are filled out, send error status
       if (!name || !deadline || !importance) {
         response.writeHead(400, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ error: "Missing required fields." }));
@@ -83,17 +90,69 @@ const handlePost = function (request, response) {
         name: String(name).trim(),
         deadline: String(deadline),
         importance: String(importance),
-        daysLeft: derivedDays({deadline})
+        daysLeft: derivedDays({ deadline }),
       };
 
       todos.push(todo);
 
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify({ todos }));
-    } catch (e) { // Could not parse JSON, send error status
-      response.writeHead(400, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ error: "Could not parse JSON" }));
+      return;
+    } else if (request.url === "/update") {
+      const { id, name, deadline, importance } = body;
+      if (!id) {
+        response.writeHead(400, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ error: "Missing id." }));
+        return;
+      }
+
+      // Find todo by id
+      const idx = todos.findIndex((t) => String(t.id) === String(id));
+      if (idx === -1) {
+        response.writeHead(404, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ error: "Todo not found." }));
+        return;
+      }
+
+      // Update provided fields
+      if (typeof name === "string") todos[idx].name = name.trim();
+      if (typeof deadline === "string") todos[idx].deadline = deadline;
+      if (typeof importance === "string") todos[idx].importance = importance;
+
+      // Recompute daysLeft
+      todos[idx].daysLeft = derivedDays({ deadline: todos[idx].deadline });
+
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ todos }));
+      return;
     }
+
+    else if (request.url === "/delete") {
+      const { id } = body;
+      if (!id) {
+        response.writeHead(400, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ error: "Missing id." }));
+        return;
+      }
+      // Find todo by id
+      const idx = todos.findIndex((t) => String(t.id) === String(id));
+      if (idx === -1) {
+        response.writeHead(404, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ error: "Todo not found." }));
+        return;
+      }
+      // Splice removes index item
+      todos.splice(idx, 1);
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ todos }));
+      return;
+    }
+    else {
+      response.writeHead(404, { "Content-Type": "text/plain" });
+      response.end("Not Found");
+      return;
+    }
+
     // response.writeHead(200, "OK", { "Content-Type": "text/plain" });
     // response.end("test");
   });
