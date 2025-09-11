@@ -12,25 +12,21 @@ My application is a one-page to-do list tracker. A user can enter the title of t
 - **Evaluation Achievement 1**: 
 1. Drinkwater
 2. What problems did the user have with your design?
-    - 
-    -
-    -
+    - Did not like that items are listed sequentially from the datestamp that they are added 
+    - Did not like that there were huge gaps between items
 3. What comments did they make that surprised you?
-    -
-    -
-    -
+    - She was suprised when she added another item it split the page.
+    - Like the editing feature - thought it was clean.
 4. What would you change about the interface based on their feedback?
-
+    I would add an ordering system -- user can choose if they want to order of filter by date due, date created, or importance. I would also do a normal list scrolling list rather than dividing the area. 
 - **Evaluation Achievement 2**: 
 1. Kortus
 2. What problems did the user have with your design?
-    -
-    -
-    -
+    - Did not like that the importances were not color-coded.
+    - Dis not like the order by creation date either.
 3. What comments did they make that surprised you?
-    -
-    -
-    -
+    - Liked the dividing of the page, but was concered about what would happen if a lot of to-dos.
 4. What would you change about the interface based on their feedback?
+    I would impelement color-coding the importance because thats a good visual fix. I would also add a filtering system.
 
 
